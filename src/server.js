@@ -77,12 +77,16 @@ let sessionChecker = (req, res, next) => {
 
 // route for Home-Page
 app.get('/', sessionChecker, (req, res) => {
+  let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  console.log(`REDIRECT VISITOR[ ${ip} ]...`);
   res.redirect('/login')
 })
 
 // route for user Login
 app.route('/login')
   .get(sessionChecker, (req, res) => {
+    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    console.log(`LOGIN PAGE, VISITOR[ ${ip} ]...`);
     res.sendFile(__dirname + '/public/login.html')
   })
   .post((req, res) => {    

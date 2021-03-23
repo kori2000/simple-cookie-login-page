@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+
+  sclp:
+    container_name: sclp
+    restart: always
+    build:
+      context: ./
+    env_file:
+      - .env
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}

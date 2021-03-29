@@ -38,7 +38,8 @@ app.use("/", router)
 app.use(cookieParser())
 
 app.use(session({
-    key: 'simple_cookie_page',
+    name: 'scp',
+    key: 'scp',
     secret: 'secret1',
     resave: false,
     saveUninitialized: false,
@@ -50,8 +51,8 @@ app.use(session({
 // This middleware will check if user's cookie is still saved in browser and user is not set, then automatically log the user out.
 // This usually happens when you stop your express server after login, your cookie still remains saved in the browser.
 app.use((req, res, next) => {
-  if (req.cookies.simple_cookie_page && !req.session.user) {
-      res.clearCookie('simple_cookie_page')        
+  if (req.cookies.scp && !req.session.user) {
+      res.clearCookie('scp')        
   }
   next()
 })
@@ -62,7 +63,7 @@ http.createServer(app).listen(PORT, () => {
 
 // middleware function to check for logged-in users
 let sessionChecker = (req, res, next) => {
-  if (req.session.user && req.cookies.simple_cookie_page) {
+  if (req.session.user && req.cookies.scp) {
       res.redirect('/dashboard')
   } else {
       next()
@@ -98,31 +99,36 @@ app.route('/login')
 
     if( (username == t_username) && (password == t_password) ) {
       
-      let cdate = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
-      req.session.user = `User Payload DATE: ${cdate}`
+      let cdate = Math.random()
+      req.session.user = `User Payload RND: ${cdate}`
 
       console.log("Okay, successfully logged in.", req.session)
 
       res.redirect('/dashboard')
     } else {
-      res.redirect('/login')
+      res.redirect('/failed')
     }
   })
 
 
 // route for user's dashboard
 app.get('/dashboard', (req, res) => {
-  if (req.session.user && req.cookies.simple_cookie_page) {
+  if (req.session.user && req.cookies.scp) {
     res.sendFile(__dirname + '/public/dashboard.html')
   } else {
-    res.redirect('/login')
+    res.redirect('/failed')
   }
+})
+
+// route for failed login
+app.get('/failed', (req, res) => {
+  res.sendFile(__dirname + '/public/failed.html')
 })
 
 // route for user logout
 app.get('/logout', (req, res) => {
-  if (req.session.user && req.cookies.simple_cookie_page) {
-    res.clearCookie('simple_cookie_page')
+  if (req.session.user && req.cookies.scp) {
+    res.clearCookie('scp')
     res.redirect('/')
   } else {
     res.redirect('/login')
